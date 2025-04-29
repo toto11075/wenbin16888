@@ -26,6 +26,19 @@ def job(symbol: str, url: str, interval: str):
     push_discord(text, url)
 
 if __name__ == "__main__":
-    # 快速在本機試一次，不用排程
+    # 1. 啟動時先跑一次（可省略）
     job("2330.TW", DAILY_URL, "1d")
-    print("測試完成，不會進入無限排程。")
+    job("2330.TW", MIN5_URL, "5m")
+
+    # 2. 設定排程：每分鐘/每 5 分鐘/每天固定時間都可以
+    schedule.every(5).minutes.do(job, symbol="2330.TW", webhook_url=MIN5_URL, interval="5m")
+    schedule.every().day.at("09:00").do(job, symbol="2330.TW", webhook_url=DAILY_URL, interval="1d")
+    # 你也可以繼續加：
+    # schedule.every(1).hours.do(...)
+    # schedule.every().monday.do(...)
+
+    # 3. 無限迴圈，持續檢查排程
+    print("✅ 無限排程已啟動，按 Ctrl+C 停止。")
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
