@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 import os
 
-DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
+DISCORD_WEBHOOK_URL = os.environ.get("https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk")
 SYMBOL = os.environ.get("SYMBOL", "2330.TW")
 
 def fetch_ma(symbol: str) -> pd.DataFrame:
