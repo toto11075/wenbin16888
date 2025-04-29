@@ -7,6 +7,7 @@ from datetime import datetime
 import schedule
 import time
 import threading
+import os
 
 # ———— 參數設定 ————
 DISCORD_WEBHOOK_URL_DAILY = 'https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk'
@@ -77,13 +78,9 @@ def wait_for_stop():
 
 if __name__ == "__main__":
     # 讓使用者輸入間隔時間
-    try:
-        interval_5min = int(input("請輸入5分鐘K推播間隔分鐘數："))
-        interval_daily = int(input("請輸入日K推播間隔分鐘數："))
-    except ValueError:
-        print("輸入錯誤，預設每1分鐘推播一次。")
-        interval_5min = 1
-        interval_daily = 1
+
+    interval_5min = 5
+    interval_daily = 60
 
     # 啟動停止監聽執行緒
     threading.Thread(target=wait_for_stop, daemon=True).start()
