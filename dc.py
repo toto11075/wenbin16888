@@ -1,46 +1,31 @@
-import requests, schedule, time, yfinance as yf
+import requests
 from datetime import datetime
+import yfinance as yf
 import pandas as pd
-import os
 
-DISCORD_WEBHOOK_URL = os.environ.get("https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk")
-SYMBOL = os.environ.get("SYMBOL", "2330.TW")
+# ———— 設定 ————
+TEST_MODE = True
+TEST_WEBHOOK = "https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk"
+DISCORD_WEBHOOK_URL_DAILY = "https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk"
+DISCORD_WEBHOOK_URL_5MIN  = "https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk"
+DAILY_URL = TEST_MODE and TEST_WEBHOOK or DISCORD_WEBHOOK_URL_DAILY
 
-def fetch_ma(symbol: str) -> pd.DataFrame:
-    df = yf.Ticker(symbol).history(period="30d")
-    df["MA5"] = df["Close"].rolling(5).mean()
+# 最核心的推播函式
+def push_discord(text: str, webhook_url: str):
+    r = requests.post(webhook_url, json={"content": text})
+    print(datetime.now(), "狀態:", r.status_code)
+
+def job(symbol: str, url: str, interval: str):
+    df = yf.Ticker(symbol).history(period="5d" if interval=="5m" else "60d",
+                                   interval=interval)
+    df["MA5"]  = df["Close"].rolling(5).mean()
     df["MA20"] = df["Close"].rolling(20).mean()
-    return df
-
-def is_golden_cross(df: pd.DataFrame) -> bool:
-    if len(df) < 2:
-        return False
-    yest = df.iloc[-2]
-    today = df.iloc[-1]
-    return yest["MA5"] <= yest["MA20"] and today["MA5"] > today["MA20"]
-
-def push_discord(text: str):
-    data = {"content": text}
-    response = requests.post(DISCORD_WEBHOOK_URL, json=data)
-    print(datetime.now(), "推播狀態:", response.status_code)
-
-def job():
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    df = fetch_ma(SYMBOL)
-    today = df.iloc[-1]
-    status = "🎉 金叉發生！" if is_golden_cross(df) else "— 未發生金叉 —"
-    text = (
-        f"【{SYMBOL} 移動平均通知】\n"
-        f"時間：{now}\n"
-        f"5MA  = {today['MA5']:.2f}\n"
-        f"20MA = {today['MA20']:.2f}\n"
-        f"狀態：{status}"
-    )
-    push_discord(text)
+    y, t = df.iloc[-2], df.iloc[-1]
+    status = "金叉！" if (y["MA5"]<=y["MA20"] and t["MA5"]>t["MA20"]) else "未金叉"
+    text = f"{symbol} {interval} {status}"
+    push_discord(text, url)
 
 if __name__ == "__main__":
-    job()
-    schedule.every(5).minutes.do(job)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    # 快速在本機試一次，不用排程
+    job("2330.TW", DAILY_URL, "1d")
+    print("測試完成，不會進入無限排程。")
