@@ -1,5 +1,3 @@
-#DISCORD_WEBHOOK_16888 ='https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk'
-#DISCORD_WEBHOOK_17888 ='https://discord.com/api/webhooks/1366465811601948732/IklK1oYEDjxdNFO8feCF_C_GaozZ96OpZbZx_8GzRUT8CTBWeOMJqqCPZu035sHWpgof'
 import yfinance as yf
 import pandas as pd
 import requests, json
@@ -10,8 +8,8 @@ import threading
 import os
 
 # ———— 參數設定 ————
-DISCORD_WEBHOOK_URL_DAILY = 'https://discord.com/api/webhooks/1366463100114567181/_ZNkB75cFx87ia4pgDJJUikujCWPkqOzMkZEVbDROqzfDt30atoospPsbeVrPbWnqRJk'
-DISCORD_WEBHOOK_URL_5MIN = 'https://discord.com/api/webhooks/1366465811601948732/IklK1oYEDjxdNFO8feCF_C_GaozZ96OpZbZx_8GzRUT8CTBWeOMJqqCPZu035sHWpgof'
+DISCORD_WEBHOOK_URL_DAILY = '0'
+DISCORD_WEBHOOK_URL_5MIN = '0'
 SYMBOLS = ['2330.TW', 'TSM']  # 要監控的多支股票
 
 # ———— 共用函式 ————
